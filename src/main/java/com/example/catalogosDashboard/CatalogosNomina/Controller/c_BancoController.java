@@ -1,11 +1,10 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_BancoEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_BancoRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_BancoService;
 
 import java.util.List;
@@ -27,29 +27,65 @@ import java.util.Optional;
 public class c_BancoController {
 
     @Autowired
-    private c_BancoService cbancoService;
+    private c_BancoService cBancoService;
 
-    @GetMapping
+    @Autowired
+    private c_BancoRepository cBancoRepository;
+
+    /* @GetMapping
     public List<c_BancoEntity> getAllData(){
-        return (List<c_BancoEntity>) cbancoService.getAllBancos();
-    } 
+        return (List<c_BancoEntity>) cBancoService.getAllBancos();
+    }  */
+
+    @GetMapping("/sort/{status}")
+    public List<c_BancoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_BancoEntity>) cBancoService.getAllBancosByStatus(status, sort);
+    }
     
     @GetMapping(value = "/{id}")
     public Optional<c_BancoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cbancoService.getBancoById(id);
+        return cBancoService.getBancoById(id);
     }
 
-    /* @PostMapping
-    public ResponseEntity<c_AduanaEntity> createRegistro(@RequestBody c_AduanaEntity var) {
+    @PostMapping("/agregar")
+    public ResponseEntity<c_BancoEntity> createRegistro(@RequestBody c_BancoEntity var) {
         try {
-            c_AduanaEntity aduana = aduanaRepository.save(var);
-            return new ResponseEntity<>(aduana, HttpStatus.CREATED);
+            c_BancoEntity banco = cBancoRepository.save(var);
+            return new ResponseEntity<>(banco, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{caduana}")
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_BancoEntity> updatingRegistro(@PathVariable("id") String idBanco, @RequestBody c_BancoEntity cBanco){
+        Optional<c_BancoEntity> bancoData = cBancoRepository.findById(idBanco);
+        
+        if(bancoData.isPresent()){
+            c_BancoEntity banco =  bancoData.get();
+            banco.setDescripcion(cBanco.getDescripcion());
+            banco.setRazonSocial(cBanco.getRazonSocial());
+            banco.setStatus(cBanco.getStatus());
+            return new ResponseEntity<>(cBancoRepository.save(banco), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_BancoEntity> updatingStatus(@PathVariable("id") String idBanco, @RequestBody c_BancoEntity cBanco){
+        Optional<c_BancoEntity> bancoData = cBancoRepository.findById(idBanco);
+        if(bancoData.isPresent()){
+            c_BancoEntity banco = bancoData.get();
+            banco.setStatus(cBanco.getStatus());
+            return new ResponseEntity<>(cBancoRepository.save(banco),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /* @DeleteMapping("/{caduana}")
     public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("caduana") String caduana) {
         try {
             aduanaRepository.deleteById(caduana);
@@ -57,20 +93,6 @@ public class c_BancoController {
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    }
-
-    @PutMapping("/{caduana}")
-    public ResponseEntity<c_AduanaEntity> updatingRegistro(@PathVariable("caduana") String idAduana, @RequestBody c_AduanaEntity cAduana){
-        Optional<c_AduanaEntity> aduanaData = aduanaRepository.findById(idAduana);
-        
-        if(aduanaData.isPresent()){
-            c_AduanaEntity aduana =  aduanaData.get();
-            aduana.setId(cAduana.getId());
-            aduana.setDescripcion(cAduana.getDescripcion());
-            aduana.setStatus(cAduana.getStatus());
-            return new ResponseEntity<>(aduanaRepository.save(aduana), HttpStatus.OK);
-        }else{
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
     } */
+
 }

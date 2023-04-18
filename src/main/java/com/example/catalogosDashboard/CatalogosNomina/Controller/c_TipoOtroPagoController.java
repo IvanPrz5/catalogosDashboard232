@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoOtroPagoEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_TipoOtroPagoRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_TipoOtroPagoService;
 
 import java.util.List;
@@ -28,9 +29,36 @@ public class c_TipoOtroPagoController {
     @Autowired
     private c_TipoOtroPagoService cTipoOtroPagoService;
 
+    @Autowired
+    private c_TipoOtroPagoRepository cTipoOtroPagoRepository;
+
     @GetMapping
     public List<c_TipoOtroPagoEntity> getAllData(){
         return (List<c_TipoOtroPagoEntity>) cTipoOtroPagoService.getAllTipoOPago();
+    } 
+
+    @PostMapping
+    public ResponseEntity<c_TipoOtroPagoEntity> createRegistro(@RequestBody c_TipoOtroPagoEntity var) {
+        try {
+            c_TipoOtroPagoEntity tipoOtroPago = cTipoOtroPagoRepository.save(var);
+            return new ResponseEntity<>(tipoOtroPago, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<c_TipoOtroPagoEntity> updatingRegistro(@PathVariable("id") String idTipoOtroPago, @RequestBody c_TipoOtroPagoEntity cTipoOtroPago){
+        Optional<c_TipoOtroPagoEntity> tipoOtroPagoData = cTipoOtroPagoRepository.findById(idTipoOtroPago);
+        
+        if(tipoOtroPagoData.isPresent()){
+            c_TipoOtroPagoEntity tipoOtroPago =  tipoOtroPagoData.get();
+            tipoOtroPago.setDescripcion(cTipoOtroPago.getDescripcion());
+            tipoOtroPago.setStatus(cTipoOtroPago.getStatus());
+            return new ResponseEntity<>(cTipoOtroPagoRepository.save(tipoOtroPago), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     } 
     
     /* @GetMapping(value = "/{id}")

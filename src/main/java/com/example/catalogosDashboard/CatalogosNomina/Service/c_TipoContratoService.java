@@ -1,8 +1,10 @@
 package com.example.catalogosDashboard.CatalogosNomina.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoContratoEntity;
@@ -12,13 +14,19 @@ import com.example.catalogosDashboard.CatalogosNomina.Repository.c_TipoContratoR
 @Service
 public class c_TipoContratoService {
     @Autowired
-    c_TipoContratoRepository cTipoContrato; 
+    c_TipoContratoRepository cTipoContratoRepository; 
 
-    public List<c_TipoContratoEntity> getAllTipoContrato(){
+    /* public List<c_TipoContratoEntity> getAllTipoContrato(){
         return cTipoContrato.findAll();
+    } */
+
+    public List<c_TipoContratoEntity> getAllTipoContratoByStatus(Boolean status, Sort sort){
+        sort = Sort.by("id");
+        List<c_TipoContratoEntity> tipoContrato = cTipoContratoRepository.findDataByStatus(status, sort);
+        return tipoContrato;
     }
 
-    /* public Optional<c_OrigenRecursoEntity> getOrigenRecursoByC_OriRec(String c_Origen_Recurso){
-        return cOrigenRecursoRepository.findByC_OrigenRecurso(c_Origen_Recurso);        
-    } */
+    public Optional<c_TipoContratoEntity> getTipoContratoById(String id){
+        return cTipoContratoRepository.findById(id);        
+    }
 }

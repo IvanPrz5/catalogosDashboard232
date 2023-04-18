@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoIncapacidadEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_TipoIncapacidadRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_TipoIncapacidadService;
 
 import java.util.List;
@@ -28,9 +29,36 @@ public class c_TipoIncapacidadController {
     @Autowired
     private c_TipoIncapacidadService cTipoIncapacidadService;
 
+    @Autowired
+    private c_TipoIncapacidadRepository cTipoIncapacidadRepository;
+
     @GetMapping
     public List<c_TipoIncapacidadEntity> getAllData(){
         return (List<c_TipoIncapacidadEntity>) cTipoIncapacidadService.getAllTipoIncapacidad();
+    } 
+
+    @PostMapping
+    public ResponseEntity<c_TipoIncapacidadEntity> createRegistro(@RequestBody c_TipoIncapacidadEntity var) {
+        try {
+            c_TipoIncapacidadEntity tipoIncapacidad = cTipoIncapacidadRepository.save(var);
+            return new ResponseEntity<>(tipoIncapacidad, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<c_TipoIncapacidadEntity> updatingRegistro(@PathVariable("id") String idTipoIncapacidad, @RequestBody c_TipoIncapacidadEntity cTipoIncapacidad){
+        Optional<c_TipoIncapacidadEntity> tipoIncapacidadData = cTipoIncapacidadRepository.findById(idTipoIncapacidad);
+        
+        if(tipoIncapacidadData.isPresent()){
+            c_TipoIncapacidadEntity tipoIncapacidad =  tipoIncapacidadData.get();
+            tipoIncapacidad.setDescripcion(cTipoIncapacidad.getDescripcion());
+            tipoIncapacidad.setStatus(cTipoIncapacidad.getStatus());
+            return new ResponseEntity<>(cTipoIncapacidadRepository.save(tipoIncapacidad), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     } 
     
     /* @GetMapping(value = "/{id}")

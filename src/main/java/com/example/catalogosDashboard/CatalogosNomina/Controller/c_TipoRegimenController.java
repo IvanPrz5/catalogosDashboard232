@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoRegimenEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_TipoRegimenRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_TipoRegimenService;
 
 import java.util.List;
@@ -28,11 +29,37 @@ public class c_TipoRegimenController {
     @Autowired
     private c_TipoRegimenService cTipoRegimenService;
 
+    @Autowired
+    private c_TipoRegimenRepository cTipoRegimenRepository;
+
     @GetMapping
     public List<c_TipoRegimenEntity> getAllData(){
         return (List<c_TipoRegimenEntity>) cTipoRegimenService.getAllRegimen();    
     } 
     
+    @PostMapping
+    public ResponseEntity<c_TipoRegimenEntity> createRegistro(@RequestBody c_TipoRegimenEntity var) {
+        try {
+            c_TipoRegimenEntity tipoRegimen = cTipoRegimenRepository.save(var);
+            return new ResponseEntity<>(tipoRegimen, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<c_TipoRegimenEntity> updatingRegistro(@PathVariable("id") String idTipoRegimen, @RequestBody c_TipoRegimenEntity cTipoRegimen){
+        Optional<c_TipoRegimenEntity> tipoRegimenData = cTipoRegimenRepository.findById(idTipoRegimen);
+        
+        if(tipoRegimenData.isPresent()){
+            c_TipoRegimenEntity tipoRegimen =  tipoRegimenData.get();
+            tipoRegimen.setDescripcion(cTipoRegimen.getDescripcion());
+            tipoRegimen.setStatus(cTipoRegimen.getStatus());
+            return new ResponseEntity<>(cTipoRegimenRepository.save(tipoRegimen), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    } 
     /* @GetMapping(value = "/{id}")
     public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
         return cPeriodicidadPagoService.getBancoById(id);

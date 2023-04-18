@@ -42,9 +42,7 @@ public class UsuarioController {
             var.setEstado(usuarioParam.getEstado());
             var.setCiudad(usuarioParam.getCiudad());
             var.setCodigoPostal(usuarioParam.getCodigoPostal());
-            var.setAbout(usuarioParam.getAbout());
-
-            
+            var.setAbout(usuarioParam.getAbout());            
             return new ResponseEntity<>(usuariosRepository.save(var), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_OrigenRecursoEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_OrigenRecursoRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_OrigenRecursoService;
 
 import java.util.List;
@@ -28,48 +28,36 @@ public class c_OrigenRecursoController {
     @Autowired
     private c_OrigenRecursoService cOrigenRecursoService;
 
+    @Autowired
+    private c_OrigenRecursoRepository cOrigenRecursoRepository;
+
     @GetMapping
     public List<c_OrigenRecursoEntity> getAllData(){
         return (List<c_OrigenRecursoEntity>) cOrigenRecursoService.getAllOrigenRecurso();
     } 
-    
-    /* @GetMapping(value = "/{c_Origen_Recurso}")
-    public Optional<c_OrigenRecursoEntity> getDataByC_OrigenRecurso(@PathVariable("c_Origen_Recurso") String c_Origen_Recurso) {
-        return cOrigenRecursoService.getOrigenRecursoByC_OriRec(c_Origen_Recurso);
-    } */
 
-    /* @PostMapping
-    public ResponseEntity<c_AduanaEntity> createRegistro(@RequestBody c_AduanaEntity var) {
+    @PostMapping
+    public ResponseEntity<c_OrigenRecursoEntity> createRegistro(@RequestBody c_OrigenRecursoEntity var) {
         try {
-            c_AduanaEntity aduana = aduanaRepository.save(var);
-            return new ResponseEntity<>(aduana, HttpStatus.CREATED);
+            c_OrigenRecursoEntity origenRecurso = cOrigenRecursoRepository.save(var);
+            return new ResponseEntity<>(origenRecurso, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{caduana}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("caduana") String caduana) {
-        try {
-            aduanaRepository.deleteById(caduana);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{caduana}")
-    public ResponseEntity<c_AduanaEntity> updatingRegistro(@PathVariable("caduana") String idAduana, @RequestBody c_AduanaEntity cAduana){
-        Optional<c_AduanaEntity> aduanaData = aduanaRepository.findById(idAduana);
+    @PutMapping("/{id}")
+    public ResponseEntity<c_OrigenRecursoEntity> updatingRegistro(@PathVariable("id") Integer idOrigenRecurso, @RequestBody c_OrigenRecursoEntity cOrigenRecurso){
+        Optional<c_OrigenRecursoEntity> origenRecursoData = cOrigenRecursoRepository.findById(idOrigenRecurso);
         
-        if(aduanaData.isPresent()){
-            c_AduanaEntity aduana =  aduanaData.get();
-            aduana.setId(cAduana.getId());
-            aduana.setDescripcion(cAduana.getDescripcion());
-            aduana.setStatus(cAduana.getStatus());
-            return new ResponseEntity<>(aduanaRepository.save(aduana), HttpStatus.OK);
+        if(origenRecursoData.isPresent()){
+            c_OrigenRecursoEntity origenRecurso =  origenRecursoData.get();
+            origenRecurso.setCod(cOrigenRecurso.getDescripcion());
+            origenRecurso.setDescripcion(cOrigenRecurso.getDescripcion());
+            origenRecurso.setStatus(cOrigenRecurso.getStatus());
+            return new ResponseEntity<>(cOrigenRecursoRepository.save(origenRecurso), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */   
+    } 
 }

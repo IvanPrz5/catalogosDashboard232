@@ -18,6 +18,10 @@ public class c_OrigenRecursoService {
         return cOrigenRecursoRepository.findAll();
     }
 
+    public Optional<c_OrigenRecursoEntity> getByCodOrigenRecurso(String cod){
+        return cOrigenRecursoRepository.findByCod(cod);
+    }
+
     /* public Optional<c_OrigenRecursoEntity> getOrigenRecursoByC_OriRec(String c_Origen_Recurso){
         return cOrigenRecursoRepository.findByC_OrigenRecurso(c_Origen_Recurso);        
     } */

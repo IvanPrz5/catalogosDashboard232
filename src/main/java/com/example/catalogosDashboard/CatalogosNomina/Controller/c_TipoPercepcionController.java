@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoPercepcionEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_TipoPercepcionRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_TipoPercepcionService;
 
 import java.util.List;
@@ -28,9 +29,36 @@ public class c_TipoPercepcionController {
     @Autowired
     private c_TipoPercepcionService cTipoPercepcionService;
 
+    @Autowired
+    private c_TipoPercepcionRepository cTipoPercepcionRepository;
+
     @GetMapping
     public List<c_TipoPercepcionEntity> getAllData(){
         return (List<c_TipoPercepcionEntity>) cTipoPercepcionService.getAllTipoPercepcion();
+    } 
+
+    @PostMapping
+    public ResponseEntity<c_TipoPercepcionEntity> createRegistro(@RequestBody c_TipoPercepcionEntity var) {
+        try {
+            c_TipoPercepcionEntity tipoPercepcion = cTipoPercepcionRepository.save(var);
+            return new ResponseEntity<>(tipoPercepcion, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<c_TipoPercepcionEntity> updatingRegistro(@PathVariable("id") String idTipoPercepcion, @RequestBody c_TipoPercepcionEntity cTipoPercepcion){
+        Optional<c_TipoPercepcionEntity> tipoPercepcionData = cTipoPercepcionRepository.findById(idTipoPercepcion);
+        
+        if(tipoPercepcionData.isPresent()){
+            c_TipoPercepcionEntity tipoPercepcion =  tipoPercepcionData.get();
+            tipoPercepcion.setDescripcion(cTipoPercepcion.getDescripcion());
+            tipoPercepcion.setStatus(cTipoPercepcion.getStatus());
+            return new ResponseEntity<>(cTipoPercepcionRepository.save(tipoPercepcion), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     } 
     
     /* @GetMapping(value = "/{id}")

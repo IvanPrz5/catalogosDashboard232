@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoHorasEntity;
+import com.example.catalogosDashboard.CatalogosNomina.Repository.c_TipoHorasRepository;
 import com.example.catalogosDashboard.CatalogosNomina.Service.c_TipoHorasService;
 
 import java.util.List;
@@ -28,9 +28,36 @@ public class c_TipoHorasController {
     @Autowired
     private c_TipoHorasService cTipoHorasService;
 
+    @Autowired
+    private c_TipoHorasRepository cTipoHorasRepository;
+
     @GetMapping
     public List<c_TipoHorasEntity> getAllData(){
         return (List<c_TipoHorasEntity>) cTipoHorasService.getAllTipoHoras();
+    } 
+
+    @PostMapping
+    public ResponseEntity<c_TipoHorasEntity> createRegistro(@RequestBody c_TipoHorasEntity var) {
+        try {
+            c_TipoHorasEntity tipoHoras = cTipoHorasRepository.save(var);
+            return new ResponseEntity<>(tipoHoras, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<c_TipoHorasEntity> updatingRegistro(@PathVariable("id") String idTipoHoras, @RequestBody c_TipoHorasEntity cTipoHoras){
+        Optional<c_TipoHorasEntity> tipoHorasData = cTipoHorasRepository.findById(idTipoHoras);
+        
+        if(tipoHorasData.isPresent()){
+            c_TipoHorasEntity tipoHoras =  tipoHorasData.get();
+            tipoHoras.setDescripcion(cTipoHoras.getDescripcion());
+            tipoHoras.setStatus(cTipoHoras.getStatus());
+            return new ResponseEntity<>(cTipoHorasRepository.save(tipoHoras), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     } 
     
     /* @GetMapping(value = "/{id}")

@@ -9,5 +9,6 @@ import com.example.catalogosDashboard.CatalogosNomina.Entity.c_OrigenRecursoEnti
 
 public interface c_OrigenRecursoRepository extends JpaRepository<c_OrigenRecursoEntity, Integer> {
     List<c_OrigenRecursoEntity> findAll();
+    Optional<c_OrigenRecursoEntity> findByCod(String cod);
     // Optional<c_OrigenRecursoEntity> findByC_OrigenRecurso(String c_Origen_Recurso);
 }
