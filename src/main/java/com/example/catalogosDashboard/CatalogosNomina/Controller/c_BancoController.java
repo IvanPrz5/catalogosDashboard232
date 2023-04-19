@@ -72,7 +72,6 @@ public class c_BancoController {
         }
     }
 
-
     @PutMapping("/updateStatus/{id}")
     public ResponseEntity<c_BancoEntity> updatingStatus(@PathVariable("id") String idBanco, @RequestBody c_BancoEntity cBanco){
         Optional<c_BancoEntity> bancoData = cBancoRepository.findById(idBanco);

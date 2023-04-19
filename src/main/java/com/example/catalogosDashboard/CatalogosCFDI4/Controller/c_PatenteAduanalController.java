@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_PatenteAduanal;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_PatenteAduanalRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_PatenteAduanalService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,44 +27,59 @@ import java.util.Optional;
 @RequestMapping("auth/PatenteAduanal")
 public class c_PatenteAduanalController {
     @Autowired
-    private c_PatenteAduanalRepository patenteaduanalRepository;
+    private c_PatenteAduanalRepository cPatenteAduanalRepository;
 
-    @GetMapping
+    @Autowired
+    private c_PatenteAduanalService cPatenteAduanalService;
+
+    /* @GetMapping
     public List<c_PatenteAduanal> getAllData() {
         return (List<c_PatenteAduanal>) patenteaduanalRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_PatenteAduanal> data(@PathVariable("id") String id) {
+        return cPatenteAduanalRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_PatenteAduanal> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_PatenteAduanal>) cPatenteAduanalService.getAllPatenteAduanalByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_PatenteAduanal> createRegistro(@RequestBody c_PatenteAduanal var) {
         try {
-            c_PatenteAduanal patenteAduanal = patenteaduanalRepository.save(var);
+            c_PatenteAduanal patenteAduanal = cPatenteAduanalRepository.save(var);
             return new ResponseEntity<>(patenteAduanal, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @DeleteMapping("/{cpatente}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cpatente") String cpatente) {
-        try {
-            patenteaduanalRepository.deleteById(cpatente);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{cpatente}")
-    public ResponseEntity<c_PatenteAduanal> updatingRegistro(@PathVariable("cpatente") String idPatente, @RequestBody c_PatenteAduanal cPatente){
-        Optional<c_PatenteAduanal> patenteData = patenteaduanalRepository.findById(idPatente);
+    
+    /* @PutMapping("/editar/{id}")
+    public ResponseEntity<c_PatenteAduanal> updatingRegistro(@PathVariable("id") String idPatenteAduanal, @RequestBody c_PatenteAduanal cPatenteAduanal){
+        Optional<c_PatenteAduanal> patenteAduanalData = cPatenteAduanalRepository.findById(idPatenteAduanal);
         
-        if(patenteData.isPresent()){
-            c_PatenteAduanal patenteAduanal = patenteData.get();
-            patenteAduanal.setCPatenteAduanal(cPatente.getCPatenteAduanal());
-            patenteAduanal.setStatus(cPatente.getStatus());
-            return new ResponseEntity<>(patenteaduanalRepository.save(patenteAduanal), HttpStatus.OK);
+        if(patenteAduanalData.isPresent()){
+            c_PatenteAduanal patenteAduanal = patenteAduanalData.get();
+            patenteAduanal.setStatus(cPatenteAduanal.getStatus());
+            return new ResponseEntity<>(cPatenteAduanalRepository.save(patenteAduanal), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     } */
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_PatenteAduanal> updatingRegistro(@PathVariable("id") String idPatenteAduanal, @RequestBody c_PatenteAduanal cPatenteAduanal){
+        Optional<c_PatenteAduanal> patenteAduanalData = cPatenteAduanalRepository.findById(idPatenteAduanal);
+        
+        if(patenteAduanalData.isPresent()){
+            c_PatenteAduanal patenteAduanal = patenteAduanalData.get();
+            patenteAduanal.setStatus(cPatenteAduanal.getStatus());
+            return new ResponseEntity<>(cPatenteAduanalRepository.save(patenteAduanal),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

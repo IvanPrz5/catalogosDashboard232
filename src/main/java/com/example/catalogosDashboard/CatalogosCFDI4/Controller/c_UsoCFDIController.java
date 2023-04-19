@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_UsoCFDI;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_UsoCFDIRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_UsoCFDIService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,48 +27,63 @@ import java.util.Optional;
 @RequestMapping("auth/UsoCFDI")
 public class c_UsoCFDIController {
     @Autowired
-    private c_UsoCFDIRepository usocfdiRepository;
+    private c_UsoCFDIRepository usoCfdiRepository;
 
-    @GetMapping
+    @Autowired
+    private c_UsoCFDIService usoCfdiService;
+
+    /* @GetMapping
     public List<c_UsoCFDI> getAllData() {
         return (List<c_UsoCFDI>) usocfdiRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_UsoCFDI> data(@PathVariable("id") String id) {
+        return usoCfdiRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_UsoCFDI> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_UsoCFDI>) usoCfdiService.getAllUsoCFDIByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_UsoCFDI> createRegistro(@RequestBody c_UsoCFDI var) {
         try {
-            c_UsoCFDI usoCFDI = usocfdiRepository.save(var);
+            c_UsoCFDI usoCFDI = usoCfdiRepository.save(var);
             return new ResponseEntity<>(usoCFDI, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cusocfdi}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cusocfdi") String cusocfdi ) {
-        try {
-            usocfdiRepository.deleteById(cusocfdi);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{cusocfdi}")
-    public ResponseEntity<c_UsoCFDI> updatingRegistro(@PathVariable("cusocfdi") String idUsoCFDI, @RequestBody c_UsoCFDI cUsoCFDI){
-        Optional<c_UsoCFDI> usocfdiData = usocfdiRepository.findById(idUsoCFDI);
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_UsoCFDI> updatingRegistro(@PathVariable("id") String idUsoCFDI, @RequestBody c_UsoCFDI cUsoCFDI){
+        Optional<c_UsoCFDI> usocfdiData = usoCfdiRepository.findById(idUsoCFDI);
         
         if(usocfdiData.isPresent()){
             c_UsoCFDI usoCFDI = usocfdiData.get();
-            usoCFDI.setId(cUsoCFDI.getId());
             usoCFDI.setDescripcion(cUsoCFDI.getDescripcion());
             usoCFDI.setRegimenFiscalReceptor(cUsoCFDI.getRegimenFiscalReceptor());
             usoCFDI.setFisica(cUsoCFDI.getFisica());
             usoCFDI.setMoral(cUsoCFDI.getMoral());
             usoCFDI.setStatus(cUsoCFDI.getStatus());
-            return new ResponseEntity<>(usocfdiRepository.save((usoCFDI)), HttpStatus.OK);
+            return new ResponseEntity<>(usoCfdiRepository.save((usoCFDI)), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_UsoCFDI> updatingStatus(@PathVariable("id") String idUsoCFDI, @RequestBody c_UsoCFDI cUsoCFDI){
+        Optional<c_UsoCFDI> usocfdiData = usoCfdiRepository.findById(idUsoCFDI);
+        
+        if(usocfdiData.isPresent()){
+            c_UsoCFDI usoCFDI = usocfdiData.get();
+            usoCFDI.setStatus(cUsoCFDI.getStatus());
+            return new ResponseEntity<>(usoCfdiRepository.save(usoCFDI),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

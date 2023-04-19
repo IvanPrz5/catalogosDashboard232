@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_TipoOtroPagoController {
     @Autowired
     private c_TipoOtroPagoRepository cTipoOtroPagoRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoOtroPagoEntity> getAllData(){
         return (List<c_TipoOtroPagoEntity>) cTipoOtroPagoService.getAllTipoOPago();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoOtroPagoEntity> getDataByIdTipoOtroPago(@PathVariable("id") String id) {
+        return cTipoOtroPagoService.getTipoOtroPagoById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoOtroPagoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoOtroPagoEntity>) cTipoOtroPagoService.getAllTipoOtroPagoByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoOtroPagoEntity> createRegistro(@RequestBody c_TipoOtroPagoEntity var) {
         try {
             c_TipoOtroPagoEntity tipoOtroPago = cTipoOtroPagoRepository.save(var);
@@ -47,7 +58,7 @@ public class c_TipoOtroPagoController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoOtroPagoEntity> updatingRegistro(@PathVariable("id") String idTipoOtroPago, @RequestBody c_TipoOtroPagoEntity cTipoOtroPago){
         Optional<c_TipoOtroPagoEntity> tipoOtroPagoData = cTipoOtroPagoRepository.findById(idTipoOtroPago);
         
@@ -61,8 +72,16 @@ public class c_TipoOtroPagoController {
         }
     } 
     
-    /* @GetMapping(value = "/{id}")
-    public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cPeriodicidadPagoService.getBancoById(id);
-    } */
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoOtroPagoEntity> updatingStatus(@PathVariable("id") String idTipoOtroPago, @RequestBody c_TipoOtroPagoEntity cTipoOtroPago){
+        Optional<c_TipoOtroPagoEntity> tipoOtroPagoData = cTipoOtroPagoRepository.findById(idTipoOtroPago);
+        
+        if(tipoOtroPagoData.isPresent()){
+            c_TipoOtroPagoEntity tipoOtroPago =  tipoOtroPagoData.get();
+            tipoOtroPago.setStatus(cTipoOtroPago.getStatus());
+            return new ResponseEntity<>(cTipoOtroPagoRepository.save(tipoOtroPago),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

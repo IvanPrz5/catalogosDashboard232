@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Pais;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_PaisRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_PaisService;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,53 +28,60 @@ import java.util.Optional;
 public class c_PaisController {
     
     @Autowired
-    private c_PaisRepository paisRepository;
+    private c_PaisRepository cPaisRepository;
 
-    @GetMapping
+    @Autowired
+    private c_PaisService cPaisService;
+
+    /* @GetMapping
     public List<c_Pais> getAllData() {
-        return (List<c_Pais>) paisRepository.findAll();
+        return (List<c_Pais>) cPaisRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_Pais> data(@PathVariable("id") String id) {
+        return cPaisRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_Pais> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_Pais>) cPaisService.getAllPaisByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_Pais> createRegistro(@RequestBody c_Pais var) {
         try {
-            c_Pais pais = paisRepository.save(var);
+            c_Pais pais = cPaisRepository.save(var);
             return new ResponseEntity<>(pais, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cpais}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cpais") String cpais) {
-        try {
-            paisRepository.deleteById(cpais);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_Pais> updatingRegistro(@PathVariable("id") String idPais, @RequestBody c_Pais cPais){
+        Optional<c_Pais> paisData = cPaisRepository.findById(idPais);
+        
+        if(paisData.isPresent()){
+            c_Pais pais =  paisData.get();
+            pais.setDescripcion(cPais.getDescripcion());
+            pais.setStatus(cPais.getStatus());
+            return new ResponseEntity<>(cPaisRepository.save(pais), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{cpais}")
-    public ResponseEntity<c_Pais> updatingRegistro(@PathVariable("cpais") String idPais, @RequestBody c_Pais cPais){
-        Optional<c_Pais> paisData = paisRepository.findById(idPais);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_Pais> updatingStatus(@PathVariable("id") String idPais, @RequestBody c_Pais cPais){
+        Optional<c_Pais> paisData = cPaisRepository.findById(idPais);
         
         if(paisData.isPresent()){
             c_Pais pais =  paisData.get();
-            pais.setId(cPais.getId());
-            pais.setDescripcion(cPais.getDescripcion());
             pais.setStatus(cPais.getStatus());
-            return new ResponseEntity<>(paisRepository.save(pais), HttpStatus.OK);
+            return new ResponseEntity<>(cPaisRepository.save(pais),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-
-        
-este mensaje fue creado automáticamente por el software de envío por correo.
-Un mensaje que enviaste no pudo ser entregado a uno más de sus destinatarios.
-Este es un error permanente.
-La siguiente dirección (es) falló :
-TOez@litasco.ch
-Dominio ceag ha superado el máximo de aplazamientos y fallas por hora
-    } */
+    }
 }

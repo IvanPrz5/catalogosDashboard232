@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Exportacion;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_ExportacionRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_ExportacionService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,45 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/Exportacion")
 public class c_ExportacionController {
     @Autowired
-    private c_ExportacionRepository exportacionRepository;
+    private c_ExportacionRepository cExportacionRepository;
 
-    @GetMapping
+    @Autowired
+    private c_ExportacionService cExportacionService;
+
+    /* @GetMapping
     public List<c_Exportacion> getAllData() {
         return (List<c_Exportacion>) exportacionRepository.findAll();
-    }/* 
+    } */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_Exportacion> data(@PathVariable("id") String id) {
+        return cExportacionRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_Exportacion> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_Exportacion>) cExportacionService.getAllExportacionByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_Exportacion> createRegistro(@RequestBody c_Exportacion var) {
         try {
-            c_Exportacion exportacion = exportacionRepository.save(var);
+            c_Exportacion exportacion = cExportacionRepository.save(var);
             return new ResponseEntity<>(exportacion, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cexportacion}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cexportacion") String cexportacion) {
-        try {
-            exportacionRepository.deleteById(cexportacion);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_Exportacion> updatingRegistro(@PathVariable("id") String idExportacion, @RequestBody c_Exportacion cExportacion){
+        Optional<c_Exportacion> exportacionData = cExportacionRepository.findById(idExportacion);
+        
+        if(exportacionData.isPresent()){
+            c_Exportacion exportacion = exportacionData.get();
+            exportacion.setDescripcion(cExportacion.getDescripcion());
+            exportacion.setStatus(cExportacion.getStatus());
+            return new ResponseEntity<>(cExportacionRepository.save((exportacion)), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{cexportacion}")
-    public ResponseEntity<c_Exportacion> updatingRegistro(@PathVariable("cexportacion") String idExportacion, @RequestBody c_Exportacion cExportacion){
-        Optional<c_Exportacion> exportacionData = exportacionRepository.findById(idExportacion);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_Exportacion> updatingStatus(@PathVariable("id") String idExportacion, @RequestBody c_Exportacion cExportacion){
+        Optional<c_Exportacion> exportacionData = cExportacionRepository.findById(idExportacion);
         
         if(exportacionData.isPresent()){
             c_Exportacion exportacion = exportacionData.get();
-            exportacion.setId(cExportacion.getId());
-            exportacion.setDescripcion(cExportacion.getDescripcion());
             exportacion.setStatus(cExportacion.getStatus());
-            return new ResponseEntity<>(exportacionRepository.save((exportacion)), HttpStatus.OK);
+            return new ResponseEntity<>(cExportacionRepository.save(exportacion),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
 }

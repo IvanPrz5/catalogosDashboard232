@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_TipoNominaController {
     @Autowired
     private c_TipoNominaRepository cTipoNominaRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoNominaEntity> getAllData(){
         return (List<c_TipoNominaEntity>) cTipoNominaService.getAllTipoNomina();
-    } 
+    }  */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoNominaEntity> getDataByIdTipoNomina(@PathVariable("id") String id) {
+        return cTipoNominaService.getTipoNominaById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoNominaEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoNominaEntity>) cTipoNominaService.getAllTipoNominaByStatus(status, sort);
+    }
     
-    @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoNominaEntity> createRegistro(@RequestBody c_TipoNominaEntity var) {
         try {
             c_TipoNominaEntity tipoNomina = cTipoNominaRepository.save(var);
@@ -47,7 +58,7 @@ public class c_TipoNominaController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoNominaEntity> updatingRegistro(@PathVariable("id") String idTipoNomina, @RequestBody c_TipoNominaEntity cTipoNomina){
         Optional<c_TipoNominaEntity> tipoNominaData = cTipoNominaRepository.findById(idTipoNomina);
         
@@ -61,8 +72,16 @@ public class c_TipoNominaController {
         }
     } 
 
-    /* @GetMapping(value = "/{id}")
-    public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cPeriodicidadPagoService.getBancoById(id);
-    } */
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoNominaEntity> updatingStatus(@PathVariable("id") String idTipoNomina, @RequestBody c_TipoNominaEntity cTipoNomina){
+        Optional<c_TipoNominaEntity> tipoNominaData = cTipoNominaRepository.findById(idTipoNomina);
+        
+        if(tipoNominaData.isPresent()){
+            c_TipoNominaEntity tipoNomina =  tipoNominaData.get();
+            tipoNomina.setStatus(cTipoNomina.getStatus());
+            return new ResponseEntity<>(cTipoNominaRepository.save(tipoNomina),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

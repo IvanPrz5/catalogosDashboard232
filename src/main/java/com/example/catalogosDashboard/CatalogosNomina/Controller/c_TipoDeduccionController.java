@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,13 +32,22 @@ public class c_TipoDeduccionController {
     @Autowired
     private c_TipoDeduccionRepository cTipoDeduccionRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoDeduccionEntity> getAllData(){
         return (List<c_TipoDeduccionEntity>) cTipoDeduccionService.getAllTipoDeducc();
-    } 
-    
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoDeduccionEntity> getDataByIdTipoDeduccion(@PathVariable("id") String id) {
+        return cTipoDeduccionService.getTipoDeduccionById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_TipoDeduccionEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoDeduccionEntity>) cTipoDeduccionService.getAllTipoDeduccionByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoDeduccionEntity> createRegistro(@RequestBody c_TipoDeduccionEntity var) {
         try {
             c_TipoDeduccionEntity tipoDeduccion = cTipoDeduccionRepository.save(var);
@@ -47,7 +57,7 @@ public class c_TipoDeduccionController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoDeduccionEntity> updatingRegistro(@PathVariable("id") String idTipoDeduccion, @RequestBody c_TipoDeduccionEntity cTipoDeduccion){
         Optional<c_TipoDeduccionEntity> tipoDeduccionData = cTipoDeduccionRepository.findById(idTipoDeduccion);
         
@@ -60,6 +70,19 @@ public class c_TipoDeduccionController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     } 
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoDeduccionEntity> updatingStatus(@PathVariable("id") String idTipoDeduccion, @RequestBody c_TipoDeduccionEntity cTipoDeduccion){
+        Optional<c_TipoDeduccionEntity> tipoDeduccionData = cTipoDeduccionRepository.findById(idTipoDeduccion);
+        
+        if(tipoDeduccionData.isPresent()){
+            c_TipoDeduccionEntity tipoDeduccion = tipoDeduccionData.get();
+            tipoDeduccion.setStatus(cTipoDeduccion.getStatus());
+            return new ResponseEntity<>(cTipoDeduccionRepository.save(tipoDeduccion),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
     /* @GetMapping(value = "/{id}")
     public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
         return cPeriodicidadPagoService.getBancoById(id);

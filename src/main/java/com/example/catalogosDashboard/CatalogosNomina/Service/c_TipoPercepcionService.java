@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoPercepcionEntity;
@@ -19,7 +20,13 @@ public class c_TipoPercepcionService {
         return cTipoPercepcionRepository.findAll();
     }
 
-    /* public Optional<c_OrigenRecursoEntity> getOrigenRecursoByC_OriRec(String c_Origen_Recurso){
-        return cOrigenRecursoRepository.findByC_OrigenRecurso(c_Origen_Recurso);        
-    } */
+    public List<c_TipoPercepcionEntity>  getAllTipoPercepcionByStatus(Boolean status, Sort sort){
+        sort = Sort.by("id");
+        List<c_TipoPercepcionEntity> tipoPercepcion= cTipoPercepcionRepository.findDataByStatus(status, sort);
+        return tipoPercepcion;
+    }
+
+    public Optional<c_TipoPercepcionEntity> getTipoPercepcionById(String id){
+        return cTipoPercepcionRepository.findById(id);        
+    }
 }

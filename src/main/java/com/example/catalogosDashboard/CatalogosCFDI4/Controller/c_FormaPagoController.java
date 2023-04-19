@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_FormaPago;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_FormaPagoRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_FormaPagoService;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,47 +28,62 @@ import java.util.Optional;
 @RequestMapping("auth/FormaPago")
 public class c_FormaPagoController {
     @Autowired
-    private c_FormaPagoRepository formaPagoRepository;
+    private c_FormaPagoRepository cFormaPagoRepository;
 
-    @GetMapping
+    @Autowired
+    private c_FormaPagoService cFormaPagoService;
+
+    /* @GetMapping
     public List<c_FormaPago> getAllData() {
         return (List<c_FormaPago>) formaPagoRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_FormaPago> data(@PathVariable("id") String id) {
+        return cFormaPagoRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_FormaPago> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_FormaPago>) cFormaPagoService.getAllFormaPagoByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_FormaPago> createRegistro(@RequestBody c_FormaPago var) {
         try {
-            c_FormaPago formaPago = formaPagoRepository.save(var);
+            c_FormaPago formaPago = cFormaPagoRepository.save(var);
             return new ResponseEntity<>(formaPago, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cformapago}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cformapago") String cformapago) {
-        try {
-            formaPagoRepository.deleteById(cformapago);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{cformapago}")
-    public ResponseEntity<c_FormaPago> updatingRegistro(@PathVariable("cformapago") String idFormaPago, @RequestBody c_FormaPago cFormaPago){
-        Optional<c_FormaPago> formaPagoData = formaPagoRepository.findById(idFormaPago);
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_FormaPago> updatingRegistro(@PathVariable("id") String idFormaPago, @RequestBody c_FormaPago cFormaPago){
+        Optional<c_FormaPago> formaPagoData = cFormaPagoRepository.findById(idFormaPago);
         
         if(formaPagoData.isPresent()){
             c_FormaPago formaPago = formaPagoData.get();
-            formaPago.setId(cFormaPago.getId());
             formaPago.setBancarizado(cFormaPago.getBancarizado());
             formaPago.setNombreBancoEmisorExtranjero(cFormaPago.getNombreBancoEmisorExtranjero());
             formaPago.setDescripcion(cFormaPago.getDescripcion());
             formaPago.setStatus(cFormaPago.getStatus());
-            return new ResponseEntity<>(formaPagoRepository.save((formaPago)), HttpStatus.OK);
+            return new ResponseEntity<>(cFormaPagoRepository.save((formaPago)), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_FormaPago> updatingStatus(@PathVariable("id") String idFormaPago, @RequestBody c_FormaPago cFormaPago){
+        Optional<c_FormaPago> formaPagoData = cFormaPagoRepository.findById(idFormaPago);
+        
+        if(formaPagoData.isPresent()){
+            c_FormaPago formaPago = formaPagoData.get();;
+            formaPago.setStatus(cFormaPago.getStatus());
+            return new ResponseEntity<>(cFormaPagoRepository.save(formaPago),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

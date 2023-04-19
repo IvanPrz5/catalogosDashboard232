@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Moneda;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_MonedaRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_MonedaService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,45 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/Moneda")
 public class c_MonedaController {
     @Autowired
-    private c_MonedaRepository monedaRepository;
+    private c_MonedaRepository cMonedaRepository;
 
-    @GetMapping
+    @Autowired
+    private c_MonedaService cMonedaService;
+
+    /* @GetMapping
     public List<c_Moneda> getAllData() {
-        return (List<c_Moneda>) monedaRepository.findAll();
+        return (List<c_Moneda>) cMonedaRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_Moneda> data(@PathVariable("id") String id) {
+        return cMonedaRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_Moneda> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_Moneda>) cMonedaService.getAllMonedaByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_Moneda> createRegistro(@RequestBody c_Moneda var) {
         try {
-            c_Moneda moneda = monedaRepository.save(var);
+            c_Moneda moneda = cMonedaRepository.save(var);
             return new ResponseEntity<>(moneda, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cmoneda}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cmoneda") String cmoneda) {
-        try {
-            monedaRepository.deleteById(cmoneda);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_Moneda> updatingRegistro(@PathVariable("id") String idMoneda, @RequestBody c_Moneda cMoneda){
+        Optional<c_Moneda> monedaData = cMonedaRepository.findById(idMoneda);
+        
+        if(monedaData.isPresent()){
+            c_Moneda moneda = monedaData.get();
+            moneda.setDescripcion(cMoneda.getDescripcion());
+            moneda.setStatus(cMoneda.getStatus());
+            return new ResponseEntity<>(cMonedaRepository.save((moneda)), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{cmoneda}")
-    public ResponseEntity<c_Moneda> updatingRegistro(@PathVariable("cmoneda") String idMoneda, @RequestBody c_Moneda cMoneda){
-        Optional<c_Moneda> monedaData = monedaRepository.findById(idMoneda);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_Moneda> updatingStatus(@PathVariable("id") String idMoneda, @RequestBody c_Moneda cMoneda){
+        Optional<c_Moneda> monedaData = cMonedaRepository.findById(idMoneda);
         
         if(monedaData.isPresent()){
             c_Moneda moneda = monedaData.get();
-            moneda.setId(cMoneda.getId());
-            moneda.setDescripcion(cMoneda.getDescripcion());
             moneda.setStatus(cMoneda.getStatus());
-            return new ResponseEntity<>(monedaRepository.save((moneda)), HttpStatus.OK);
+            return new ResponseEntity<>(cMonedaRepository.save(moneda),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
 }

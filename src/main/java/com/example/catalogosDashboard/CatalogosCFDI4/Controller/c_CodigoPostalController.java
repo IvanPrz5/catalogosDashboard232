@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_CodigoPostal;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_CodigoPostalRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_CodigoPostalService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,10 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/CodigoPostal")
 public class c_CodigoPostalController {
     @Autowired
-    private c_CodigoPostalRepository codigoPostalRepository;
+    private c_CodigoPostalRepository cCodigoPostalRepository;
 
-    @GetMapping
+    @Autowired
+    private c_CodigoPostalService cCodigoPostalService;
+
+    /* @GetMapping
     public List<c_CodigoPostal> getAllData() {
         return (List<c_CodigoPostal>) codigoPostalRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_CodigoPostal> data(@PathVariable("id") String id) {
+        return cCodigoPostalRepository.findById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_CodigoPostal> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_CodigoPostal>) cCodigoPostalService.getAllCodigoPostalByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
+    public ResponseEntity<c_CodigoPostal> createRegistro(@RequestBody c_CodigoPostal var) {
+        try {
+            c_CodigoPostal codigoPostal = cCodigoPostalRepository.save(var);
+            return new ResponseEntity<>(codigoPostal, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    /* @PutMapping("/editar/{id}")
+    public ResponseEntity<c_CodigoPostal> updatingRegistro(@PathVariable("id") String idCodigoPostal, @RequestBody c_CodigoPostal cCodigoPostal){
+        Optional<c_CodigoPostal> codigoPostalData = cCodigoPostalRepository.findById(idCodigoPostal);
+        
+        if(codigoPostalData.isPresent()){
+            c_CodigoPostal codigoPostal =  codigoPostalData.get();
+            codigoPostal.setDescripcion(cCodigoPostal.getDescripcion());
+            codigoPostal.setStatus(cCodigoPostal.getStatus());
+            return new ResponseEntity<>(cCodigoPostalRepository.save(codigoPostal), HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    } */
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_CodigoPostal> updatingStatus(@PathVariable("id") String idCodigoPostal, @RequestBody c_CodigoPostal cCodigoPostal){
+        Optional<c_CodigoPostal> codigoPostalData = cCodigoPostalRepository.findById(idCodigoPostal);
+        
+        if(codigoPostalData.isPresent()){
+            c_CodigoPostal codigoPostal =  codigoPostalData.get();
+            codigoPostal.setStatus(cCodigoPostal.getStatus());
+            return new ResponseEntity<>(cCodigoPostalRepository.save(codigoPostal),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
     }
 }

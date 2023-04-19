@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Localidad;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_LocalidadRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_LocalidadService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,46 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/Localidad")
 public class c_LocalidadController {
     @Autowired
-    private c_LocalidadRepository localidadRepository;
+    private c_LocalidadRepository cLocalidadRepository;
 
-    @GetMapping
+    @Autowired
+    private c_LocalidadService cLocalidadService;
+
+    /* @GetMapping
     public List<c_Localidad> getAllData() {
-        return (List<c_Localidad>) localidadRepository.findAll();
+        return (List<c_Localidad>) cLocalidadRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_Localidad> data(@PathVariable("id") String id) {
+        return cLocalidadRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_Localidad> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_Localidad>) cLocalidadService.getAllLocalidadByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_Localidad> createRegistro(@RequestBody c_Localidad var) {
         try {
-            c_Localidad localidad = localidadRepository.save(var);
+            c_Localidad localidad = cLocalidadRepository.save(var);
             return new ResponseEntity<>(localidad, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{clocalidad}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("clocalidad") String clocalidad) {
-        try {
-            localidadRepository.deleteById(clocalidad);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{clocalidad}")
-    public ResponseEntity<c_Localidad> updatingRegistro(@PathVariable("clocalidad") String idLocalidad, @RequestBody c_Localidad cLocalidad){
-        Optional<c_Localidad> localidadData = localidadRepository.findById(idLocalidad);
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_Localidad> updatingRegistro(@PathVariable("id") String idLocalidad, @RequestBody c_Localidad cLocalidad){
+        Optional<c_Localidad> localidadData = cLocalidadRepository.findById(idLocalidad);
         
         if(localidadData.isPresent()){
             c_Localidad localidad = localidadData.get();
-            localidad.setCLocalidad(cLocalidad.getCLocalidad());
             localidad.setDescripcion(cLocalidad.getDescripcion());
-            localidad.setEstado(cLocalidad.getEstado());
             localidad.setStatus(cLocalidad.getStatus());
-            return new ResponseEntity<>(localidadRepository.save((localidad)), HttpStatus.OK);
+            return new ResponseEntity<>(cLocalidadRepository.save((localidad)), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    } 
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_Localidad> updatingStatus(@PathVariable("id") String idLocalidad, @RequestBody c_Localidad cLocalidad){
+        Optional<c_Localidad> localidadData = cLocalidadRepository.findById(idLocalidad);
+        
+        if(localidadData.isPresent()){
+            c_Localidad localidad = localidadData.get();
+            localidad.setStatus(cLocalidad.getStatus());
+            return new ResponseEntity<>(cLocalidadRepository.save(localidad),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

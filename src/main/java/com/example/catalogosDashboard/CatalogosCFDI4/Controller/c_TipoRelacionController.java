@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_TipoRelacion;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_TipoRelacionRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_TipoRelacionService;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,45 +28,60 @@ import java.util.Optional;
 public class c_TipoRelacionController {
     
     @Autowired
-    private c_TipoRelacionRepository tiporelacionRepository;
+    private c_TipoRelacionRepository tipoRelacionRepository;
 
-    @GetMapping
+    @Autowired
+    private c_TipoRelacionService tipoRelacionService;
+
+    /* @GetMapping
     public List<c_TipoRelacion> getAllData() {
         return (List<c_TipoRelacion>) tiporelacionRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoRelacion> data(@PathVariable("id") String id) {
+        return tipoRelacionRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_TipoRelacion> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoRelacion>) tipoRelacionService.getAllTipoRelacionByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoRelacion> createRegistro(@RequestBody c_TipoRelacion var) {
         try {
-            c_TipoRelacion tipoRelacion = tiporelacionRepository.save(var);
+            c_TipoRelacion tipoRelacion = tipoRelacionRepository.save(var);
             return new ResponseEntity<>(tipoRelacion, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{ctiporel}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("ctiporel") String ctiporel ) {
-        try {
-            tiporelacionRepository.deleteById(ctiporel);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_TipoRelacion> updatingRegistro(@PathVariable("id") String idTipoRel, @RequestBody c_TipoRelacion cTipoRel){
+        Optional<c_TipoRelacion> tipoRelData = tipoRelacionRepository.findById(idTipoRel);
+        
+        if(tipoRelData.isPresent()){
+            c_TipoRelacion tipoRelacion = tipoRelData.get();
+            tipoRelacion.setDescripcion(cTipoRel.getDescripcion());
+            tipoRelacion.setStatus(cTipoRel.getStatus());
+            return new ResponseEntity<>(tipoRelacionRepository.save((tipoRelacion)), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{ctiporel}")
-    public ResponseEntity<c_TipoRelacion> updatingRegistro(@PathVariable("ctiporel") String idTipoRel, @RequestBody c_TipoRelacion cTipoRel){
-        Optional<c_TipoRelacion> tipoRelData = tiporelacionRepository.findById(idTipoRel);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoRelacion> updatingStatus(@PathVariable("id") String idTipoRel, @RequestBody c_TipoRelacion cTipoRel){
+        Optional<c_TipoRelacion> tipoRelData = tipoRelacionRepository.findById(idTipoRel);
         
         if(tipoRelData.isPresent()){
             c_TipoRelacion tipoRelacion = tipoRelData.get();
-            tipoRelacion.setId(cTipoRel.getId());
-            tipoRelacion.setDescripcion(cTipoRel.getDescripcion());
             tipoRelacion.setStatus(cTipoRel.getStatus());
-            return new ResponseEntity<>(tiporelacionRepository.save((tipoRelacion)), HttpStatus.OK);
+            return new ResponseEntity<>(tipoRelacionRepository.save(tipoRelacion),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
 }

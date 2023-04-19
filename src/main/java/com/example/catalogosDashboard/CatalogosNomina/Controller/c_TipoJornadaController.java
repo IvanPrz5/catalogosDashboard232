@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_TipoJornadaController {
     @Autowired
     private c_TipoJornadaRepository cTipoJornadaRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoJornadaEntity> getAllData(){
         return (List<c_TipoJornadaEntity>) cTipoJornadaService.getAllTipoJornada();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoJornadaEntity> getDataByIdTipoJornada(@PathVariable("id") String id) {
+        return cTipoJornadaService.getTipoJornadaById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoJornadaEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoJornadaEntity>) cTipoJornadaService.getAllTipoJornadaByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoJornadaEntity> createRegistro(@RequestBody c_TipoJornadaEntity var) {
         try {
             c_TipoJornadaEntity tipoJornada = cTipoJornadaRepository.save(var);
@@ -47,7 +58,7 @@ public class c_TipoJornadaController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoJornadaEntity> updatingRegistro(@PathVariable("id") String idTipoJornada, @RequestBody c_TipoJornadaEntity cTipoJornada){
         Optional<c_TipoJornadaEntity> tipoJornadaData = cTipoJornadaRepository.findById(idTipoJornada);
         
@@ -61,8 +72,16 @@ public class c_TipoJornadaController {
         }
     } 
     
-    /* @GetMapping(value = "/{id}")
-    public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cPeriodicidadPagoService.getBancoById(id);
-    } */
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoJornadaEntity> updatingStatus(@PathVariable("id") String idTipoJornada, @RequestBody c_TipoJornadaEntity cTipoJornada){
+        Optional<c_TipoJornadaEntity> tipoJornadaData = cTipoJornadaRepository.findById(idTipoJornada);
+        
+        if(tipoJornadaData.isPresent()){
+            c_TipoJornadaEntity tipoJornada =  tipoJornadaData.get();
+            tipoJornada.setStatus(cTipoJornada.getStatus());
+            return new ResponseEntity<>(cTipoJornadaRepository.save(tipoJornada),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

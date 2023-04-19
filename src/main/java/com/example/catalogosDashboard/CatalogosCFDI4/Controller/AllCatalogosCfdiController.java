@@ -1,4 +1,4 @@
-package com.example.catalogosDashboard.CatalogosNomina.Controller;
+package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import java.util.List;
 
@@ -9,18 +9,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.catalogosDashboard.CatalogosNomina.Entity.AllCatalogosEntity;
-import com.example.catalogosDashboard.CatalogosNomina.Repository.AllCatalogosRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Entity.AllCatalogosCfdiEntity;
+import com.example.catalogosDashboard.CatalogosCFDI4.Repository.AllCatalogosCfdiRepository;
 
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT, })
 @RestController
-@RequestMapping("auth/Catalogos")
-public class AllCatalogosController {
+@RequestMapping("auth/Catalogos/Cfdi")
+public class AllCatalogosCfdiController {
+    
     @Autowired
-    private AllCatalogosRepository catalogosRepository;
+    private AllCatalogosCfdiRepository catalogosCfdiRepository;
 
     @GetMapping
-    public List<AllCatalogosEntity> getAllData(){
-        return (List<AllCatalogosEntity>) catalogosRepository.findAll();
+    public List<AllCatalogosCfdiEntity> getAllData(){
+        return (List<AllCatalogosCfdiEntity>) catalogosCfdiRepository.findAll();
     } 
 }
+

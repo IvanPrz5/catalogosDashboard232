@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,12 +32,22 @@ public class c_TipoHorasController {
     @Autowired
     private c_TipoHorasRepository cTipoHorasRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoHorasEntity> getAllData(){
         return (List<c_TipoHorasEntity>) cTipoHorasService.getAllTipoHoras();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoHorasEntity> getDataByIdTipoHoras(@PathVariable("id") String id) {
+        return cTipoHorasService.getTipoHorasById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoHorasEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoHorasEntity>) cTipoHorasService.getAllTipoHorasByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoHorasEntity> createRegistro(@RequestBody c_TipoHorasEntity var) {
         try {
             c_TipoHorasEntity tipoHoras = cTipoHorasRepository.save(var);
@@ -46,7 +57,7 @@ public class c_TipoHorasController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoHorasEntity> updatingRegistro(@PathVariable("id") String idTipoHoras, @RequestBody c_TipoHorasEntity cTipoHoras){
         Optional<c_TipoHorasEntity> tipoHorasData = cTipoHorasRepository.findById(idTipoHoras);
         
@@ -59,6 +70,19 @@ public class c_TipoHorasController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     } 
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoHorasEntity> updatingStatus(@PathVariable("id") String idTipoHoras, @RequestBody c_TipoHorasEntity cTipoHoras){
+        Optional<c_TipoHorasEntity> tipoHorasData = cTipoHorasRepository.findById(idTipoHoras);
+        
+        if(tipoHorasData.isPresent()){
+            c_TipoHorasEntity tipoHoras =  tipoHorasData.get();
+            tipoHoras.setStatus(cTipoHoras.getStatus());
+            return new ResponseEntity<>(cTipoHorasRepository.save(tipoHoras),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
     
     /* @GetMapping(value = "/{id}")
     public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {

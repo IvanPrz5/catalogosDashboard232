@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,12 +32,22 @@ public class c_OrigenRecursoController {
     @Autowired
     private c_OrigenRecursoRepository cOrigenRecursoRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_OrigenRecursoEntity> getAllData(){
         return (List<c_OrigenRecursoEntity>) cOrigenRecursoService.getAllOrigenRecurso();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_OrigenRecursoEntity> getDataByIdOrigenRecurso(@PathVariable("id") Integer id) {
+        return cOrigenRecursoService.getOrigenRecursoById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_OrigenRecursoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_OrigenRecursoEntity>) cOrigenRecursoService.getAllOrigenRecursoByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_OrigenRecursoEntity> createRegistro(@RequestBody c_OrigenRecursoEntity var) {
         try {
             c_OrigenRecursoEntity origenRecurso = cOrigenRecursoRepository.save(var);
@@ -46,7 +57,7 @@ public class c_OrigenRecursoController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_OrigenRecursoEntity> updatingRegistro(@PathVariable("id") Integer idOrigenRecurso, @RequestBody c_OrigenRecursoEntity cOrigenRecurso){
         Optional<c_OrigenRecursoEntity> origenRecursoData = cOrigenRecursoRepository.findById(idOrigenRecurso);
         
@@ -60,4 +71,17 @@ public class c_OrigenRecursoController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     } 
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_OrigenRecursoEntity> updatingStatus(@PathVariable("id") Integer idOrigenRecurso, @RequestBody c_OrigenRecursoEntity cOrigenRecurso){
+        Optional<c_OrigenRecursoEntity> origenRecursoData = cOrigenRecursoRepository.findById(idOrigenRecurso);
+        
+        if(origenRecursoData.isPresent()){
+            c_OrigenRecursoEntity origenRecurso =  origenRecursoData.get();
+            origenRecurso.setStatus(cOrigenRecurso.getStatus());
+            return new ResponseEntity<>(cOrigenRecursoRepository.save(origenRecurso),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

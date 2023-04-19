@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_RegimenFiscal;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_RegimenFiscalRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_RegimenFiscalService;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,47 +28,62 @@ import java.util.Optional;
 public class c_RegimenFiscalController {
     
     @Autowired
-    private c_RegimenFiscalRepository regimenfiscalRepository;
+    private c_RegimenFiscalRepository regimenFiscalRepository;
 
-    @GetMapping
+    @Autowired
+    private c_RegimenFiscalService regimenFiscalService;
+
+    /* @GetMapping
     public List<c_RegimenFiscal> getAllData() {
         return (List<c_RegimenFiscal>) regimenfiscalRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_RegimenFiscal> data(@PathVariable("id") String id) {
+        return regimenFiscalRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_RegimenFiscal> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_RegimenFiscal>) regimenFiscalService.getAllRegimenFiscalByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_RegimenFiscal> createRegistro(@RequestBody c_RegimenFiscal var) {
         try {
-            c_RegimenFiscal regimenFiscal = regimenfiscalRepository.save(var);
+            c_RegimenFiscal regimenFiscal = regimenFiscalRepository.save(var);
             return new ResponseEntity<>(regimenFiscal, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cregimenfiscal}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cregimenfiscal") String cregimenfiscal ) {
-        try {
-            regimenfiscalRepository.deleteById(cregimenfiscal);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{cregimenfiscal}")
-    public ResponseEntity<c_RegimenFiscal> updatingRegistro(@PathVariable("cregimenfiscal") String idRegimenF, @RequestBody c_RegimenFiscal cRegimenF){
-        Optional<c_RegimenFiscal> regimenFData = regimenfiscalRepository.findById(idRegimenF);
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_RegimenFiscal> updatingRegistro(@PathVariable("id") String idRegimenF, @RequestBody c_RegimenFiscal cRegimenF){
+        Optional<c_RegimenFiscal> regimenFData = regimenFiscalRepository.findById(idRegimenF);
         
         if(regimenFData.isPresent()){
             c_RegimenFiscal regimenFiscal = regimenFData.get();
-            regimenFiscal.setId(cRegimenF.getId());
             regimenFiscal.setDescripcion(cRegimenF.getDescripcion());
             regimenFiscal.setFisica(cRegimenF.getFisica());
             regimenFiscal.setMoral(cRegimenF.getMoral());
             regimenFiscal.setStatus(cRegimenF.getStatus());
-            return new ResponseEntity<>(regimenfiscalRepository.save((regimenFiscal)), HttpStatus.OK);
+            return new ResponseEntity<>(regimenFiscalRepository.save((regimenFiscal)), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_RegimenFiscal> updatingStatus(@PathVariable("id") String idRegimenFiscal, @RequestBody c_RegimenFiscal cRegimenFiscal){
+        Optional<c_RegimenFiscal> regimenFData = regimenFiscalRepository.findById(idRegimenFiscal);
+        
+        if(regimenFData.isPresent()){
+            c_RegimenFiscal regimenFiscal = regimenFData.get();
+            regimenFiscal.setStatus(cRegimenFiscal.getStatus());
+            return new ResponseEntity<>(regimenFiscalRepository.save(regimenFiscal),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

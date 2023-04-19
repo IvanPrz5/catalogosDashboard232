@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_TipoDeComprobante;
-import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_TipoDeComprobanteRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_TipoComp;
+import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_TipoCompRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_TipoCompService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,45 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/TipoComprobante")
 public class c_TipoComController {
     @Autowired
-    private c_TipoDeComprobanteRepository tipocomRepository;
+    private c_TipoCompRepository tipoComRepository;
 
-    @GetMapping
-    public List<c_TipoDeComprobante> getAllData() {
-        return (List<c_TipoDeComprobante>) tipocomRepository.findAll();
+    @Autowired
+    private c_TipoCompService tipoComService;
+
+    /* @GetMapping
+    public List<c_TipoComp> getAllData() {
+        return (List<c_TipoComp>) tipocomRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoComp> data(@PathVariable("id") String id) {
+        return tipoComRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_TipoComp> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoComp>) tipoComService.getAllTipoCompByStatus(status, sort);
     }
 
-    /* @PostMapping
-    public ResponseEntity<c_TipoDeComprobante> createRegistro(@RequestBody c_TipoDeComprobante var) {
+    @PostMapping("/agregar")
+    public ResponseEntity<c_TipoComp> createRegistro(@RequestBody c_TipoComp var) {
         try {
-            c_TipoDeComprobante tipoDeComprobante = tipocomRepository.save(var);
+            c_TipoComp tipoDeComprobante = tipoComRepository.save(var);
             return new ResponseEntity<>(tipoDeComprobante, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{ctipocom}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("ctipocom") String ctipocom ) {
-        try {
-            tipocomRepository.deleteById(ctipocom);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_TipoComp> updatingRegistro(@PathVariable("id") String idTipoCom, @RequestBody c_TipoComp cTipoCom){
+        Optional<c_TipoComp> tipocomData = tipoComRepository.findById(idTipoCom);
+        
+        if(tipocomData.isPresent()){
+            c_TipoComp tipoDeComprobante = tipocomData.get();
+            tipoDeComprobante.setDescripcion(cTipoCom.getDescripcion());
+            tipoDeComprobante.setStatus(cTipoCom.getStatus());
+            return new ResponseEntity<>(tipoComRepository.save((tipoDeComprobante)), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{ctipocom}")
-    public ResponseEntity<c_TipoDeComprobante> updatingRegistro(@PathVariable("ctipocom") String idTipoCom, @RequestBody c_TipoDeComprobante cTipoCom){
-        Optional<c_TipoDeComprobante> tipocomData = tipocomRepository.findById(idTipoCom);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoComp> updatingStatus(@PathVariable("id") String idTipoCom, @RequestBody c_TipoComp cTipoCom){
+        Optional<c_TipoComp> tipocomData = tipoComRepository.findById(idTipoCom);
         
         if(tipocomData.isPresent()){
-            c_TipoDeComprobante tipoDeComprobante = tipocomData.get();
-            tipoDeComprobante.setId(cTipoCom.getId());
-            tipoDeComprobante.setDescripcion(cTipoCom.getDescripcion());
+            c_TipoComp tipoDeComprobante = tipocomData.get();
             tipoDeComprobante.setStatus(cTipoCom.getStatus());
-            return new ResponseEntity<>(tipocomRepository.save((tipoDeComprobante)), HttpStatus.OK);
+            return new ResponseEntity<>(tipoComRepository.save(tipoDeComprobante),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
 }

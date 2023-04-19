@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Impuesto;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_ImpuestoRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_ImpuestoService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,54 +27,65 @@ import java.util.Optional;
 @RestController
 @RequestMapping("auth/Impuesto")
 public class c_ImpuestoController {
+
     @Autowired
-    private c_ImpuestoRepository impuestoRepository;
+    private c_ImpuestoRepository cImpuestoRepository;
 
-    @GetMapping
+    @Autowired
+    private c_ImpuestoService cImpuestoService;
+
+    /* @GetMapping
     public List<c_Impuesto> getAllData() {
-        return (List<c_Impuesto>) impuestoRepository.findAll();
+        return (List<c_Impuesto>) cImpuestoRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_Impuesto> data(@PathVariable("id") String id) {
+        return cImpuestoRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_Impuesto> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_Impuesto>) cImpuestoService.getAllImpuestoByStatus(status, sort);
     }
 
-    @GetMapping(value = "/{cimpuesto}")
-    public Optional<c_Impuesto> data(@PathVariable("cimpuesto") String cimpuesto) {
-        return impuestoRepository.findById(cimpuesto);
-    }
-
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_Impuesto> createRegistro(@RequestBody c_Impuesto var) {
         try {
-            c_Impuesto impuesto = impuestoRepository.save(var);
+            c_Impuesto impuesto = cImpuestoRepository.save(var);
             return new ResponseEntity<>(impuesto, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cimpuesto}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cimpuesto") String cimpuesto) {
-        try {
-            impuestoRepository.deleteById(cimpuesto);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{cimpuesto}")
-    public ResponseEntity<c_Impuesto> updatingRegistro(@PathVariable("cimpuesto") String idImpuesto, @RequestBody c_Impuesto cImpuesto){
-        Optional<c_Impuesto> impuestoData = impuestoRepository.findById(idImpuesto);
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_Impuesto> updatingRegistro(@PathVariable("id") String idImpuesto, @RequestBody c_Impuesto cImpuesto){
+        Optional<c_Impuesto> impuestoData = cImpuestoRepository.findById(idImpuesto);
         
         if(impuestoData.isPresent()){
             c_Impuesto impuesto =  impuestoData.get();
-            impuesto.setId(cImpuesto.getId());
             impuesto.setDescripcion(cImpuesto.getDescripcion());
             impuesto.setRetencion(cImpuesto.getRetencion());
             impuesto.setTraslado(cImpuesto.getTraslado());
             impuesto.setLocalFederal(cImpuesto.getLocalFederal());
             impuesto.setStatus(cImpuesto.getStatus());
-            return new ResponseEntity<>(impuestoRepository.save(impuesto), HttpStatus.OK);
+            return new ResponseEntity<>(cImpuestoRepository.save(impuesto), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    } 
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_Impuesto> updatingStatus(@PathVariable("id") String idImpuesto, @RequestBody c_Impuesto cImpuesto){
+        Optional<c_Impuesto> impuestoData = cImpuestoRepository.findById(idImpuesto);
+        
+        if(impuestoData.isPresent()){
+            c_Impuesto impuesto =  impuestoData.get();
+            impuesto.setStatus(cImpuesto.getStatus());
+            return new ResponseEntity<>(cImpuestoRepository.save(impuesto),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

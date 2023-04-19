@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_TasaoCuota;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_TasaoCuotaRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_TasaoCuotaService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,36 +27,35 @@ import java.util.Optional;
 @RequestMapping("auth/TasaoCuota")
 public class c_TasaoCuotaController {
     @Autowired
-    private c_TasaoCuotaRepository tasaocuotaRepository;
+    private c_TasaoCuotaRepository tasaCuotaRepository;
 
-    @GetMapping
-    public List<c_TasaoCuota> getAllData() {
-        return (List<c_TasaoCuota>) tasaocuotaRepository.findAll();
+    @Autowired
+    private c_TasaoCuotaService tasaCuotaService;
+
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_TasaoCuota> data(@PathVariable("id") Integer id) {
+        return tasaCuotaRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_TasaoCuota> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TasaoCuota>) tasaCuotaService.getAllTasaoCoutaByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_TasaoCuota> createRegistro(@RequestBody c_TasaoCuota var) {
         try {
-            c_TasaoCuota tasaoCuota = tasaocuotaRepository.save(var);
+            c_TasaoCuota tasaoCuota = tasaCuotaRepository.save(var);
             return new ResponseEntity<>(tasaoCuota, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{ctasacuota}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("ctasacuota") Integer ctasacuota ) {
-        try {
-            tasaocuotaRepository.deleteById(ctasacuota);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{ctasacuota}")
-    public ResponseEntity<c_TasaoCuota> updatingRegistro(@PathVariable("ctasacuota") Integer idTasaCuota, @RequestBody c_TasaoCuota cTasaoCuota){
-        Optional<c_TasaoCuota> tasacuotaData = tasaocuotaRepository.findById(idTasaCuota);
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_TasaoCuota> updatingRegistro(@PathVariable("id") Integer idTasaCuota, @RequestBody c_TasaoCuota cTasaoCuota){
+        Optional<c_TasaoCuota> tasacuotaData = tasaCuotaRepository.findById(idTasaCuota);
         
         if(tasacuotaData.isPresent()){
             c_TasaoCuota tasaoCuota = tasacuotaData.get();
@@ -66,9 +67,22 @@ public class c_TasaoCuotaController {
             tasaoCuota.setTraslado(cTasaoCuota.getTraslado());
             tasaoCuota.setRetencion(cTasaoCuota.getRetencion());
             tasaoCuota.setStatus(cTasaoCuota.getStatus());
-            return new ResponseEntity<>(tasaocuotaRepository.save((tasaoCuota)), HttpStatus.OK);
+            return new ResponseEntity<>(tasaCuotaRepository.save((tasaoCuota)), HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TasaoCuota> updatingstatus(@PathVariable("id") Integer idTasaCuota, @RequestBody c_TasaoCuota cTasaoCuota){
+        Optional<c_TasaoCuota> tasacuotaData = tasaCuotaRepository.findById(idTasaCuota);
+        
+        if(tasacuotaData.isPresent()){
+            c_TasaoCuota tasaoCuota = tasacuotaData.get();
+            tasaoCuota.setStatus(cTasaoCuota.getStatus());
+            return new ResponseEntity<>(tasaCuotaRepository.save(tasaoCuota),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

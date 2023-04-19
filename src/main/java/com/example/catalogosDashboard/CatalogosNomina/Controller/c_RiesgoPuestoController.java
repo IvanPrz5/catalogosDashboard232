@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -31,12 +32,22 @@ public class c_RiesgoPuestoController {
     @Autowired
     private c_RiesgoPuestoRepository cRiesgoPuestoRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_RiesgoPuestoEntity> getAllData(){
         return (List<c_RiesgoPuestoEntity>) cRiesgoPuestoService.getAllRiesgoPuesto();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_RiesgoPuestoEntity> getDataByIdRiesgoPuesto(@PathVariable("id") Integer id) {
+        return cRiesgoPuestoService.getRiesgoPuestoById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_RiesgoPuestoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_RiesgoPuestoEntity>) cRiesgoPuestoService.getAllRiesgoPuestoByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_RiesgoPuestoEntity> createRegistro(@RequestBody c_RiesgoPuestoEntity var) {
         try {
             c_RiesgoPuestoEntity riesgoPuesto = cRiesgoPuestoRepository.save(var);
@@ -46,7 +57,7 @@ public class c_RiesgoPuestoController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_RiesgoPuestoEntity> updatingRegistro(@PathVariable("id") Integer idRiesgoPuesto, @RequestBody c_RiesgoPuestoEntity cRiesgoPuesto){
         Optional<c_RiesgoPuestoEntity> riesgoPuestoData = cRiesgoPuestoRepository.findById(idRiesgoPuesto);
         
@@ -60,6 +71,19 @@ public class c_RiesgoPuestoController {
         }
     } 
     
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_RiesgoPuestoEntity> updatingStatus(@PathVariable("id") Integer idRiesgoPuesto, @RequestBody c_RiesgoPuestoEntity cRiesgoPuesto){
+        Optional<c_RiesgoPuestoEntity> riesgoPuestoData = cRiesgoPuestoRepository.findById(idRiesgoPuesto);
+        
+        if(riesgoPuestoData.isPresent()){
+            c_RiesgoPuestoEntity riesgoPuesto = riesgoPuestoData.get();
+            riesgoPuesto.setStatus(cRiesgoPuesto.getStatus());
+            return new ResponseEntity<>(cRiesgoPuestoRepository.save(riesgoPuesto),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
+
     /* @GetMapping(value = "/{id}")
     public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
         return cPeriodicidadPagoService.getBancoById(id);

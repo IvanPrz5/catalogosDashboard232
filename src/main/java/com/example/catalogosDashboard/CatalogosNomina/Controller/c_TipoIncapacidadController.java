@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_TipoIncapacidadController {
     @Autowired
     private c_TipoIncapacidadRepository cTipoIncapacidadRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoIncapacidadEntity> getAllData(){
         return (List<c_TipoIncapacidadEntity>) cTipoIncapacidadService.getAllTipoIncapacidad();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoIncapacidadEntity> getDataByIdTipoIncapacidad(@PathVariable("id") String id) {
+        return cTipoIncapacidadService.getTipoIncapacidadById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoIncapacidadEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoIncapacidadEntity>) cTipoIncapacidadService.getAllTipoIncapacidadByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoIncapacidadEntity> createRegistro(@RequestBody c_TipoIncapacidadEntity var) {
         try {
             c_TipoIncapacidadEntity tipoIncapacidad = cTipoIncapacidadRepository.save(var);
@@ -47,7 +58,7 @@ public class c_TipoIncapacidadController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoIncapacidadEntity> updatingRegistro(@PathVariable("id") String idTipoIncapacidad, @RequestBody c_TipoIncapacidadEntity cTipoIncapacidad){
         Optional<c_TipoIncapacidadEntity> tipoIncapacidadData = cTipoIncapacidadRepository.findById(idTipoIncapacidad);
         
@@ -61,8 +72,16 @@ public class c_TipoIncapacidadController {
         }
     } 
     
-    /* @GetMapping(value = "/{id}")
-    public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cPeriodicidadPagoService.getBancoById(id);
-    } */
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoIncapacidadEntity> updatingStatus(@PathVariable("id") String idTipoIncapacidad, @RequestBody c_TipoIncapacidadEntity cTipoIncapacidad){
+        Optional<c_TipoIncapacidadEntity> tipoIncapacidadData = cTipoIncapacidadRepository.findById(idTipoIncapacidad);
+        
+        if(tipoIncapacidadData.isPresent()){
+            c_TipoIncapacidadEntity tipoIncapacidad =  tipoIncapacidadData.get();
+            tipoIncapacidad.setStatus(cTipoIncapacidad.getStatus());
+            return new ResponseEntity<>(cTipoIncapacidadRepository.save(tipoIncapacidad),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

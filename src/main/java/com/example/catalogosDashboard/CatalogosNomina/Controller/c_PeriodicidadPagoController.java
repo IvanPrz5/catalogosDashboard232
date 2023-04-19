@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_PeriodicidadPagoController {
     @Autowired
     private c_PeriodicidadPagoRepository cPeriodicidadPagoRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_PeriodicidadPagoEntity> getAllData(){
         return (List<c_PeriodicidadPagoEntity>) cPeriodicidadPagoService.getAllPeriodicidadPago();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_PeriodicidadPagoEntity> getDataByIdPeriodicidadPago(@PathVariable("id") String id) {
+        return cPeriodicidadPagoService.getPeriodicidadById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_PeriodicidadPagoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_PeriodicidadPagoEntity>) cPeriodicidadPagoService.getAllPeriodicidadPagoByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_PeriodicidadPagoEntity> createRegistro(@RequestBody c_PeriodicidadPagoEntity var) {
         try {
             c_PeriodicidadPagoEntity perioPago = cPeriodicidadPagoRepository.save(var);
@@ -47,7 +58,7 @@ public class c_PeriodicidadPagoController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_PeriodicidadPagoEntity> updatingRegistro(@PathVariable("id") String idPeriodicidadPago, @RequestBody c_PeriodicidadPagoEntity cPeriodicidadPago){
         Optional<c_PeriodicidadPagoEntity> periodicidadPagoData = cPeriodicidadPagoRepository.findById(idPeriodicidadPago);
         
@@ -60,6 +71,19 @@ public class c_PeriodicidadPagoController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     } 
+
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_PeriodicidadPagoEntity> updatingStatus(@PathVariable("id") String idPeriodicidadPago, @RequestBody c_PeriodicidadPagoEntity cPeriodicidadPago){
+        Optional<c_PeriodicidadPagoEntity> periodicidadPagoData = cPeriodicidadPagoRepository.findById(idPeriodicidadPago);
+
+        if(periodicidadPagoData.isPresent()){
+            c_PeriodicidadPagoEntity periodicidadPago =  periodicidadPagoData.get();
+            periodicidadPago.setStatus(cPeriodicidadPago.getStatus());
+            return new ResponseEntity<>(cPeriodicidadPagoRepository.save(periodicidadPago),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
     
     /* @GetMapping(value = "/{id}")
     public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {

@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Municipio;
 import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_MunicipioRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_MunicipioService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,46 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/Municipio")
 public class c_MunicipioController {
     @Autowired
-    private c_MunicipioRepository municipioRepository;
+    private c_MunicipioRepository cMunicipioRepository;
 
-    @GetMapping
+    @Autowired
+    private c_MunicipioService cMunicipioService;
+
+    /* @GetMapping
     public List<c_Municipio> getAllData() {
         return (List<c_Municipio>) municipioRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_Municipio> data(@PathVariable("id") String id) {
+        return cMunicipioRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_Municipio> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_Municipio>) cMunicipioService.getAllMunicipioByStatus(status, sort);
     }
 
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_Municipio> createRegistro(@RequestBody c_Municipio var) {
         try {
-            c_Municipio municipio = municipioRepository.save(var);
+            c_Municipio municipio = cMunicipioRepository.save(var);
             return new ResponseEntity<>(municipio, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @DeleteMapping("/{cmunicipio}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cmunicipio") String cmunicipio) {
-        try {
-            municipioRepository.deleteById(cmunicipio);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_Municipio> updatingRegistro(@PathVariable("id") String idMunicipio, @RequestBody c_Municipio cMunicipio){
+        Optional<c_Municipio> municipioData = cMunicipioRepository.findById(idMunicipio);
+        
+        if(municipioData.isPresent()){
+            c_Municipio municipio = municipioData.get();
+            municipio.setDescripcion(cMunicipio.getDescripcion());
+            municipio.setStatus(cMunicipio.getStatus());
+            return new ResponseEntity<>(cMunicipioRepository.save((municipio)), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{cmunicipio}")
-    public ResponseEntity<c_Municipio> updatingRegistro(@PathVariable("cmunicipio") String idMunicipio, @RequestBody c_Municipio cMunicipio){
-        Optional<c_Municipio> municipioData = municipioRepository.findById(idMunicipio);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_Municipio> updatingStatus(@PathVariable("id") String idMunicipio, @RequestBody c_Municipio cMunicipio){
+        Optional<c_Municipio> municipioData = cMunicipioRepository.findById(idMunicipio);
         
         if(municipioData.isPresent()){
             c_Municipio municipio = municipioData.get();
-            municipio.setCMunicipio(cMunicipio.getCMunicipio());
-            municipio.setDescripcion(cMunicipio.getDescripcion());
-            municipio.setEstado(cMunicipio.getEstado());
             municipio.setStatus(cMunicipio.getStatus());
-            return new ResponseEntity<>(municipioRepository.save((municipio)), HttpStatus.OK);
+            return new ResponseEntity<>(cMunicipioRepository.save(municipio),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
 }

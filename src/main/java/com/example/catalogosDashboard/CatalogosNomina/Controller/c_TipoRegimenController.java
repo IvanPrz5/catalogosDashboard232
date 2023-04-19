@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_TipoRegimenController {
     @Autowired
     private c_TipoRegimenRepository cTipoRegimenRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoRegimenEntity> getAllData(){
         return (List<c_TipoRegimenEntity>) cTipoRegimenService.getAllRegimen();    
-    } 
+    } */ 
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoRegimenEntity> getDataByIdTipoRegimen(@PathVariable("id") String id) {
+        return cTipoRegimenService.getTipoRegimenById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoRegimenEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoRegimenEntity>) cTipoRegimenService.getAllTipoRegimenByStatus(status, sort);
+    }
     
-    @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoRegimenEntity> createRegistro(@RequestBody c_TipoRegimenEntity var) {
         try {
             c_TipoRegimenEntity tipoRegimen = cTipoRegimenRepository.save(var);
@@ -47,7 +58,7 @@ public class c_TipoRegimenController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/editar/{id}")
     public ResponseEntity<c_TipoRegimenEntity> updatingRegistro(@PathVariable("id") String idTipoRegimen, @RequestBody c_TipoRegimenEntity cTipoRegimen){
         Optional<c_TipoRegimenEntity> tipoRegimenData = cTipoRegimenRepository.findById(idTipoRegimen);
         
@@ -60,8 +71,17 @@ public class c_TipoRegimenController {
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     } 
-    /* @GetMapping(value = "/{id}")
-    public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cPeriodicidadPagoService.getBancoById(id);
-    } */
+    
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoRegimenEntity> updatingStatus(@PathVariable("id") String idTipoRegimen, @RequestBody c_TipoRegimenEntity cTipoRegimen){
+        Optional<c_TipoRegimenEntity> tipoRegimenData = cTipoRegimenRepository.findById(idTipoRegimen);
+        
+        if(tipoRegimenData.isPresent()){
+            c_TipoRegimenEntity tipoRegimen =  tipoRegimenData.get();;
+            tipoRegimen.setStatus(cTipoRegimen.getStatus());
+            return new ResponseEntity<>(cTipoRegimenRepository.save(tipoRegimen),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }   
+    }
 }

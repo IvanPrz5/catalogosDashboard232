@@ -17,7 +17,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name="c_Tipo_Comprobante")
-public class c_TipoDeComprobante {
+public class c_TipoComp {
     @Id
     // @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;

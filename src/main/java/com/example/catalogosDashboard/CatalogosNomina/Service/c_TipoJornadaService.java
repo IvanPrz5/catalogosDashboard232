@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.catalogosDashboard.CatalogosNomina.Entity.c_TipoJornadaEntity;
@@ -14,11 +15,17 @@ public class c_TipoJornadaService {
     @Autowired
     c_TipoJornadaRepository cTipoJornadaRepository; 
 
-    public List<c_TipoJornadaEntity> getAllTipoJornada(){
+    /* public List<c_TipoJornadaEntity> getAllTipoJornada(){
         return cTipoJornadaRepository.findAll();
+    } */
+
+    public List<c_TipoJornadaEntity>  getAllTipoJornadaByStatus(Boolean status, Sort sort){
+        sort = Sort.by("id");
+        List<c_TipoJornadaEntity> tipoJornada = cTipoJornadaRepository.findDataByStatus(status, sort);
+        return tipoJornada;
     }
 
-    /* public Optional<c_OrigenRecursoEntity> getOrigenRecursoByC_OriRec(String c_Origen_Recurso){
-        return cOrigenRecursoRepository.findByC_OrigenRecurso(c_Origen_Recurso);        
-    } */
+    public Optional<c_TipoJornadaEntity> getTipoJornadaById(String id){
+        return cTipoJornadaRepository.findById(id);        
+    }
 }

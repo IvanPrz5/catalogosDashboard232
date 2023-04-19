@@ -37,14 +37,14 @@ public class c_TipoContratoController {
         return (List<c_TipoContratoEntity>) cTipoContratoService.getAllTipoContrato();
     }  */
 
-    @GetMapping("/sort/{status}")
-    public List<c_TipoContratoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
-        return (List<c_TipoContratoEntity>) cTipoContratoService.getAllTipoContratoByStatus(status, sort);
-    }
-
     @GetMapping(value = "/{id}")
     public Optional<c_TipoContratoEntity> getDataByIdTipoContrato(@PathVariable("id") String id) {
         return cTipoContratoService.getTipoContratoById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoContratoEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoContratoEntity>) cTipoContratoService.getAllTipoContratoByStatus(status, sort);
     }
 
     @PostMapping("agregar")

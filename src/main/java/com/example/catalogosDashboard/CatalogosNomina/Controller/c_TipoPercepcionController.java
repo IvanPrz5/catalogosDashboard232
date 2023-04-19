@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosNomina.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -32,12 +33,22 @@ public class c_TipoPercepcionController {
     @Autowired
     private c_TipoPercepcionRepository cTipoPercepcionRepository;
 
-    @GetMapping
+    /* @GetMapping
     public List<c_TipoPercepcionEntity> getAllData(){
         return (List<c_TipoPercepcionEntity>) cTipoPercepcionService.getAllTipoPercepcion();
-    } 
+    }  */
 
-    @PostMapping
+    @GetMapping(value = "/{id}")
+    public Optional<c_TipoPercepcionEntity> getDataByIdTipoPercepcion(@PathVariable("id") String id) {
+        return cTipoPercepcionService.getTipoPercepcionById(id);
+    }
+
+    @GetMapping("/sort/{status}")
+    public List<c_TipoPercepcionEntity> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_TipoPercepcionEntity>) cTipoPercepcionService.getAllTipoPercepcionByStatus(status, sort);
+    }
+
+    @PostMapping("/agregar")
     public ResponseEntity<c_TipoPercepcionEntity> createRegistro(@RequestBody c_TipoPercepcionEntity var) {
         try {
             c_TipoPercepcionEntity tipoPercepcion = cTipoPercepcionRepository.save(var);
@@ -47,7 +58,7 @@ public class c_TipoPercepcionController {
         }
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("editar/{id}")
     public ResponseEntity<c_TipoPercepcionEntity> updatingRegistro(@PathVariable("id") String idTipoPercepcion, @RequestBody c_TipoPercepcionEntity cTipoPercepcion){
         Optional<c_TipoPercepcionEntity> tipoPercepcionData = cTipoPercepcionRepository.findById(idTipoPercepcion);
         
@@ -61,8 +72,16 @@ public class c_TipoPercepcionController {
         }
     } 
     
-    /* @GetMapping(value = "/{id}")
-    public Optional<c_PeriodicidadPagoEntity> getDataByIdBanco(@PathVariable("id") String id) {
-        return cPeriodicidadPagoService.getBancoById(id);
-    } */
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_TipoPercepcionEntity> updatingStatus(@PathVariable("id") String idTipoPercepcion, @RequestBody c_TipoPercepcionEntity cTipoPercepcion){
+        Optional<c_TipoPercepcionEntity> tipoPercepcionData = cTipoPercepcionRepository.findById(idTipoPercepcion);
+        
+        if(tipoPercepcionData.isPresent()){
+            c_TipoPercepcionEntity tipoPercepcion =  tipoPercepcionData.get();
+            tipoPercepcion.setStatus(cTipoPercepcion.getStatus());
+            return new ResponseEntity<>(cTipoPercepcionRepository.save(tipoPercepcion),HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+    }
 }

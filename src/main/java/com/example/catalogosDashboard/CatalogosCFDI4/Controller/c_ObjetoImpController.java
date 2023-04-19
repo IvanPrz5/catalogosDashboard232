@@ -1,6 +1,7 @@
 package com.example.catalogosDashboard.CatalogosCFDI4.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_ObjetoImp;
-import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_ObjetoImpRepostory;
+import com.example.catalogosDashboard.CatalogosCFDI4.Repository.c_ObjetoImpRepository;
+import com.example.catalogosDashboard.CatalogosCFDI4.Service.c_ObjetoImpService;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,50 +27,60 @@ import java.util.Optional;
 @RequestMapping("auth/ObjetoImp")
 public class c_ObjetoImpController {
     @Autowired
-    private c_ObjetoImpRepostory objetoimpRepository;
+    private c_ObjetoImpRepository cObjetoImpRepository;
 
-    @GetMapping
+    @Autowired
+    private c_ObjetoImpService cObjetoImpService;
+
+    /* @GetMapping
     public List<c_ObjetoImp> getAllData() {
-        return (List<c_ObjetoImp>) objetoimpRepository.findAll();
+        return (List<c_ObjetoImp>) cObjetoimpRepository.findAll();
+    } */
+
+    @GetMapping(value = "/{id}")
+    public Optional<c_ObjetoImp> data(@PathVariable("id") String id) {
+        return cObjetoImpRepository.findById(id);
+    }
+    
+    @GetMapping("/sort/{status}")
+    public List<c_ObjetoImp> getDataByStatus(@PathVariable("status") Boolean status, Sort sort) {
+        return (List<c_ObjetoImp>) cObjetoImpService.getAllObjetoImpByStatus(status, sort);
     }
 
-    @GetMapping(value = "/{cobjetoimp}")
-    public Optional<c_ObjetoImp> data(@PathVariable("cobjetoimp") String cobjetoimp) {
-        return objetoimpRepository.findById(cobjetoimp);
-    }
-
-    /* @PostMapping
+    @PostMapping("/agregar")
     public ResponseEntity<c_ObjetoImp> createRegistro(@RequestBody c_ObjetoImp var) {
         try {
-            c_ObjetoImp objetoimp = objetoimpRepository.save(var);
+            c_ObjetoImp objetoimp = cObjetoImpRepository.save(var);
             return new ResponseEntity<>(objetoimp, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/{cobjetoimp}")
-    public ResponseEntity<HttpStatus> deleteRegistro(@PathVariable("cobjetoimp") String cobjetoimp) {
-        try {
-            objetoimpRepository.deleteById(cobjetoimp);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
+    @PutMapping("/editar/{id}")
+    public ResponseEntity<c_ObjetoImp> updatingRegistro(@PathVariable("id") String idObjetoImp, @RequestBody c_ObjetoImp cObjetoImp){
+        Optional<c_ObjetoImp> objetoImpData = cObjetoImpRepository.findById(idObjetoImp);
+        
+        if(objetoImpData.isPresent()){
+            c_ObjetoImp objetoImp =  objetoImpData.get();
+            objetoImp.setDescripcion(cObjetoImp.getDescripcion());
+            objetoImp.setStatus(cObjetoImp.getStatus());
+            return new ResponseEntity<>(cObjetoImpRepository.save(objetoImp), HttpStatus.OK);
+        }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
     }
 
-    @PutMapping("/{cobjetoimp}")
-    public ResponseEntity<c_ObjetoImp> updatingRegistro(@PathVariable("cobjetoimp") String idObjetoImp, @RequestBody c_ObjetoImp cObjetoImp){
-        Optional<c_ObjetoImp> objetoImpData = objetoimpRepository.findById(idObjetoImp);
+    @PutMapping("/updateStatus/{id}")
+    public ResponseEntity<c_ObjetoImp> updatingStatus(@PathVariable("id") String idObjetoImp, @RequestBody c_ObjetoImp cObjetoImp){
+        Optional<c_ObjetoImp> objetoImpData = cObjetoImpRepository.findById(idObjetoImp);
         
         if(objetoImpData.isPresent()){
             c_ObjetoImp objetoImp =  objetoImpData.get();
-            objetoImp.setId(cObjetoImp.getId());
-            objetoImp.setDescripcion(cObjetoImp.getDescripcion());
             objetoImp.setStatus(cObjetoImp.getStatus());
-            return new ResponseEntity<>(objetoimpRepository.save(objetoImp), HttpStatus.OK);
+            return new ResponseEntity<>(cObjetoImpRepository.save(objetoImp),HttpStatus.OK);
         }else{
             return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
         }
-    } */
+    }
 }
