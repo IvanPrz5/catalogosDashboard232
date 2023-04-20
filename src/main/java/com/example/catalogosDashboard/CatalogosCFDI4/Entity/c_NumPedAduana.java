@@ -20,9 +20,9 @@ import lombok.Setter;
 public class c_NumPedAduana {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer cod;
+    private Integer id;
     @Column
-    private String id;
+    private String cod;
     @Column
     private String patente;
     @Column

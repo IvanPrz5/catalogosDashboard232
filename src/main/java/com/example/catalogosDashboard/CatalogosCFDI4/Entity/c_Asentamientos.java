@@ -20,9 +20,9 @@ import lombok.Setter;
 public class c_Asentamientos {
     @Id
     //@GeneratedValue(strategy = GenerationType.AUTO)
-    private String cod;
-    @Column
     private String id;
+    @Column
+    private String cod;
     @Column
     private String nombre;
     @Column

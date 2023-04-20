@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 @Entity
@@ -17,6 +18,7 @@ import lombok.Setter;
 @Table(name="c_Aduana")
 public class c_Aduana {
     @Id
+    @NonNull
     //@GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
     @Column

@@ -25,7 +25,7 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE, RequestMethod.PUT, })
 
 @RestController
-@RequestMapping("auth/NumPedimentoAduana")
+@RequestMapping("auth/NumPedAduana")
 public class c_NumPedAduanaController {
 
     @Autowired

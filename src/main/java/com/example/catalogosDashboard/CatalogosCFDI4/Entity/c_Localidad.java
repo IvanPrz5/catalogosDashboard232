@@ -25,9 +25,9 @@ import lombok.Setter;
 public class c_Localidad {
     @Id
     // @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String cod;
-    @Column
     private String id;
+    @Column
+    private String cod;
     @Column
     private String descripcion;
     @Column
