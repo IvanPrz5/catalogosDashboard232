@@ -10,4 +10,3 @@ import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_NumPedAduana;
 public interface c_NumPedAduanaRepository extends JpaRepository <c_NumPedAduana, Integer>{
     List<c_NumPedAduana> findDataByStatus(Boolean status, Sort sort);
 }
- 

@@ -64,6 +64,7 @@ public class c_AduanaController {
         
         if(aduanaData.isPresent()){
             c_Aduana aduana =  aduanaData.get();
+            aduana.setId(cAduana.getId());
             aduana.setDescripcion(cAduana.getDescripcion());
             aduana.setStatus(cAduana.getStatus());
             return new ResponseEntity<>(cAduanaRepository.save(aduana), HttpStatus.OK);

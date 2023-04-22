@@ -3,6 +3,9 @@ package com.example.catalogosDashboard.CatalogosCFDI4.Service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -14,9 +17,14 @@ public class c_AsentamientosService {
     @Autowired
     c_AsentamientosRepository cAsentamientosRepository; 
 
-    public List<c_Asentamientos> getAllAsentamientosByStatus(Boolean status, Sort sort){
-        sort = Sort.by("id");
-        List<c_Asentamientos> asentamientos = cAsentamientosRepository.findDataByStatus(status, sort);
-        return asentamientos;
+    public Page<c_Asentamientos> paginas(Integer page, Integer size, Boolean enablePagination) {
+        return cAsentamientosRepository.findAll(enablePagination ? PageRequest.of(page, size): Pageable.unpaged());
     }
+
+    /* public List<c_Asentamientos> getAllAsentamientosByStatus(Boolean status, int pageable){
+        // sort = Sort.by("id");
+        Pageable page = PageRequest.of(pageable, 50);
+        List<c_Asentamientos> asentamientos = cAsentamientosRepository.findDataByStatus(status, page);
+        return asentamientos;
+    } */
 }
