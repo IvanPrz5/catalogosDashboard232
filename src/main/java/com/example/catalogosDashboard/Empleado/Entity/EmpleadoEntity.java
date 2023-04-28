@@ -2,6 +2,10 @@ package com.example.catalogosDashboard.Empleado.Entity;
 
 import java.time.LocalDate;
 
+import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Asentamientos;
+import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Estado;
+import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Localidad;
+import com.example.catalogosDashboard.CatalogosCFDI4.Entity.c_Municipio;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.Column;
@@ -75,7 +79,7 @@ public class EmpleadoEntity {
     @Column
     private Boolean status;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "idSubEmpresa")
     private SubEmpresasEntity subEmpresasEntity;
 
@@ -87,27 +91,23 @@ public class EmpleadoEntity {
     @JoinColumn(name = "idDepartamento")
     private DepartamentoEntity departamentoEntity;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "idSindicato")
     private SindicatoEntity sindicatoEntity;
 
-    /* @ManyToOne
-    @JoinColumn(name = "idEstadoCivil")
-    private EstadoCivilEntity estadoCivilEntity; */
-
-    /* @ManyToOne
-    @JoinColumn(name = "idAsentamientos")
-    private c_Asentamientos asentamientosEntity; */
-
-    /* @ManyToOne
-    @JoinColumn(name = "idAgencia")
-    private c_Asentamientos asentamientosEntity; */
-
-    /* @ManyToOne
-    @JoinColumn(name = "idMunicipio")
-    private c_Municipio municipioEntity; */
-
-    /* @ManyToOne
+    @ManyToOne
     @JoinColumn(name = "idEstado")
-    private c_Estado estadoEntity; */
+    private c_Estado estadoEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "idMunicipio")
+    private c_Municipio municipioEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "idLocalidad")
+    private c_Localidad localidadEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "idAsentamientos")
+    private c_Asentamientos asentamientosEntity;
 }

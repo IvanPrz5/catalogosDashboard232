@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -38,7 +39,7 @@ public class PercepcionesEntity {
     private Boolean status;
 
     @ManyToOne
-    @JoinColumn(name = "idEmpresasPercepcion")
+    @JoinColumn(name = "idEmpresaPercepcion")
     private EmpresaPercepcionEntity empresaPercepcionEntity;
 
     @ManyToOne
@@ -52,4 +53,13 @@ public class PercepcionesEntity {
     @ManyToOne
     @JoinColumn(name = "idSubEmpresa")
     private SubEmpresasEntity subEmpresasEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "idUsuarioAlta")
+    private UsuariosNominaEntity usuariosAltaEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "idUsuarioBaja")
+    private UsuariosNominaEntity usuariosBajaEntity;
+    
 }

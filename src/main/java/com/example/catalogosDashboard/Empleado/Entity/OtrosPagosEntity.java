@@ -52,4 +52,12 @@ public class OtrosPagosEntity {
     @ManyToOne
     @JoinColumn(name = "idSubEmpresa")
     private SubEmpresasEntity subEmpresasEntity;
+    
+    @ManyToOne
+    @JoinColumn(name = "idUsuarioAlta")
+    private UsuariosNominaEntity usuariosAltaEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "idUsuarioBaja")
+    private UsuariosNominaEntity usuariosBajaEntity;
 }
